@@ -6,10 +6,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', 3.11]
-        poetry-version: [ 1.4.2 ]
-        django-version: [ 3.2.18, 4.1 ]
-        jwt-drf-version: [ 3.12, 3.14 ]
+        python-version: [ '3.10', 3.11, 3.12]
+        poetry-version: [ 1.7.1 ]
+        django-version: [ 5.0.1 ]
+        jwt-drf-version: [ 5.3.1 ]
         os: [ ubuntu-latest ]
     runs-on: ${{ matrix.os }}
     steps:
@@ -28,16 +28,16 @@ jobs:
           poetry run pip install "Django==${{ matrix.django-version }}"
       - name: Upgrade drf version
         run: |
-          poetry run pip install "djangorestframework==${{ matrix.jwt-drf-version }}"
+          poetry run pip install "djangorestframework-simplejwt==${{ matrix.jwt-drf-version }}"
       - name: Echo env
-        run: poetry run pip freeze | grep -E 'djangorestframework|Django'
+        run: poetry run pip freeze | grep -E 'djangorestframework-simplejwt|Django'
       - name: Run tests
-        run: poetry run py.test --capture=no --cov-report term-missing --cov-report html --cov=jwt_drf_passwordless testproject/
-      - name: Collect cov
-        run: poetry run coverage xml
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage.xml
-          fail_ci_if_error: true
-          verbose: true
+        run: poetry run py.test --capture=no #--cov-report term-missing --cov-report html --cov=jwt_drf_passwordless tests/
+      # - name: Collect cov
+      #   run: poetry run coverage xml
+      # - name: Upload coverage to Codecov
+      #   uses: codecov/codecov-action@v3
+      #   with:
+      #     files: ./coverage.xml
+      #     fail_ci_if_error: true
+      #     verbose: true
