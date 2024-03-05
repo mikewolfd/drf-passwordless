@@ -1,7 +1,7 @@
-**⛔️ ALPHA -- WORK IN PROGRESS *
+# **⛔️ ALPHA -- WORK IN PROGRESS**
 
 # jwt drf passwordless
-A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms` and `django-phonenumber-field` and `djangorestframework-simplejwt` with complete statelessness in mind.
+A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms`, `django-phonenumber-field`, `typeid-python` and `djangorestframework-simplejwt` with complete statelessness in mind.
 
 ## 🔑 Before you start!
 Please consider your risk and threat landscape before adopting this library. 
