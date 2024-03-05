@@ -4,7 +4,7 @@
 # You can set these variables from the command line.
 SPHINXOPTS    =
 SPHINXBUILD   = python -msphinx
-SPHINXPROJ    = djoser_passwordless
+SPHINXPROJ    = jwt_drf_passwordless
 SOURCEDIR     = .
 BUILDDIR      = _build
 

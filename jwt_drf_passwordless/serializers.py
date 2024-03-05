@@ -1,20 +1,27 @@
 from phonenumber_field.serializerfields import PhoneNumberField
-from rest_framework import serializers, validators
-from djoser_passwordless.constants import Messages
+from rest_framework import serializers
+from jwt_drf_passwordless.constants import Messages
 from django.contrib.auth import get_user_model
 from .services import PasswordlessTokenService
-from djoser_passwordless.conf import settings
+from django.contrib.auth.models import update_last_login
+from jwt_drf_passwordless.conf import settings
+from rest_framework_simplejwt import tokens, settings as jwt_settings
 
 User = get_user_model()
+
 
 class AbstractPasswordlessTokenRequestSerializer(serializers.Serializer):
     @property
     def token_request_identifier_field(self):
-        return NotImplementedError("Passwordless request needs to define at least one field to request a token with.")
-    
+        return NotImplementedError(
+            "Passwordless request needs to define at least one field to request a token with."
+        )
+
     def find_user_by_identifier(self, identifier_value):
         try:
-            return User.objects.get(**{self.token_request_identifier_field: identifier_value})
+            return User.objects.get(
+                **{self.token_request_identifier_field: identifier_value}
+            )
         except User.DoesNotExist:
             return None
 
@@ -29,15 +36,14 @@ class AbstractPasswordlessTokenRequestSerializer(serializers.Serializer):
     def create(self, validated_data):
         identifier_value = validated_data[self.token_request_identifier_field]
         user = self.find_user_by_identifier(identifier_value)
-
         if settings.REGISTER_NONEXISTENT_USERS is True and not user:
             attributes = {
                 self.token_request_identifier_field: identifier_value,
-                User.USERNAME_FIELD: settings.GENERATORS.username_generator(),
+                **settings.GENERATORS.username_generator(),
             }
             user = User.objects.create(**attributes)
             if settings.REGISTRATION_SETS_UNUSABLE_PASSWORD:
-              user.set_unusable_password()
+                user.set_unusable_password()
             user.save()
         return user
 
@@ -46,7 +52,7 @@ class PasswordlessEmailTokenRequestSerializerMixin(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields[settings.EMAIL_FIELD_NAME] = serializers.EmailField(required=True)
-    
+
     @property
     def token_request_identifier_field(self):
         return settings.EMAIL_FIELD_NAME
@@ -60,17 +66,47 @@ class PasswordlessMobileTokenRequestSerializerMixin(object):
     @property
     def token_request_identifier_field(self):
         return settings.MOBILE_FIELD_NAME
-    
 
-class PasswordlessEmailTokenRequestSerializer(PasswordlessEmailTokenRequestSerializerMixin, AbstractPasswordlessTokenRequestSerializer):
+
+class PasswordlessEmailTokenRequestSerializer(
+    PasswordlessEmailTokenRequestSerializerMixin,
+    AbstractPasswordlessTokenRequestSerializer,
+):
     pass
 
-class PasswordlessMobileTokenRequestSerializer(PasswordlessMobileTokenRequestSerializerMixin, AbstractPasswordlessTokenRequestSerializer):
+
+class PasswordlessMobileTokenRequestSerializer(
+    PasswordlessMobileTokenRequestSerializerMixin,
+    AbstractPasswordlessTokenRequestSerializer,
+):
     pass
 
 
-# EXCHANGE (Turning a OTP into an Auth token)
+class PasswordlessJwtRefreshTokenResponse:
+    token_class = tokens.RefreshToken
+
+    @classmethod
+    def get_token(cls, user):
+        return cls.token_class.for_user(user)  # type: ignore
+
+    @classmethod
+    def generate_auth_token(cls, user):
+        refresh = cls.get_token(user)
+        data = {}
+        data["refresh"] = str(refresh)
+        data["access"] = str(refresh.access_token)
+        if jwt_settings.api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, user)
+        return data
+
+
 class AbstractPasswordlessTokenExchangeSerializer(serializers.Serializer):
+    token_serializer_class = (
+        settings.SERIALIZERS.passwordless_token_response_class
+        if settings.SERIALIZERS.passwordless_token_response_class is not None
+        else PasswordlessJwtRefreshTokenResponse
+    )
+
     @property
     def token_request_identifier_field(self):
         return None
@@ -80,26 +116,32 @@ class AbstractPasswordlessTokenExchangeSerializer(serializers.Serializer):
     }
     token = serializers.CharField(required=True)
 
+    @classmethod
+    def generate_auth_token(cls, user):
+        return cls.token_serializer_class.generate_auth_token(user)  # type: ignore
+
     def validate(self, attrs):
         super().validate(attrs)
         valid_token = PasswordlessTokenService.check_token(
-              attrs.get("token", None),
-              self.token_request_identifier_field,
-              attrs.get(self.token_request_identifier_field, None),
-          )
+            attrs.get("token", None),
+            self.token_request_identifier_field,
+            attrs.get(self.token_request_identifier_field, None),
+        )
         if valid_token:
             self.user = valid_token.user
-            return attrs
+            return self.generate_auth_token(self.user)
         self.fail("invalid_credentials")
 
 
-class PasswordlessEmailTokenExchangeSerializer(PasswordlessEmailTokenRequestSerializerMixin, AbstractPasswordlessTokenExchangeSerializer):
+class PasswordlessEmailTokenExchangeSerializer(
+    PasswordlessEmailTokenRequestSerializerMixin,
+    AbstractPasswordlessTokenExchangeSerializer,
+):
     pass
-    
 
-class PasswordlessMobileTokenExchangeSerializer(PasswordlessMobileTokenRequestSerializerMixin, AbstractPasswordlessTokenExchangeSerializer):
-    pass
-    
 
-class StandalonePasswordlessExchangeSerializer(AbstractPasswordlessTokenExchangeSerializer):
+class PasswordlessMobileTokenExchangeSerializer(
+    PasswordlessMobileTokenRequestSerializerMixin,
+    AbstractPasswordlessTokenExchangeSerializer,
+):
     pass

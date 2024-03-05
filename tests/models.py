@@ -13,14 +13,16 @@ class StandardUserManager(BaseUserManager):
         user.save()
         return user
 
+
 class StandardUser(AbstractUser):
-    email = models.EmailField(blank=True)
     # Phone number is field agnostic, but it expects all numbers to be in E.164 format
     # or other configured format according to django phonenumber field settings
     phone_number = models.CharField(max_length=20, blank=False, null=True)
-    username = models.CharField(max_length=150)
     USERNAME_FIELD = "username"
     objects = StandardUserManager()
+
+    class Meta:
+        app_label = "tests"
 
 
 class CustomUserManager(BaseUserManager):
@@ -33,6 +35,7 @@ class CustomUserManager(BaseUserManager):
         user.save()
         return user
 
+
 class CustomUser(AbstractBaseUser):
     custom_username = models.CharField(max_length=150)
     custom_email = models.EmailField(blank=True)
@@ -43,3 +46,6 @@ class CustomUser(AbstractBaseUser):
 
     EMAIL_FIELD = "custom_email"
     USERNAME_FIELD = "custom_username"
+
+    class Meta:
+        app_label = "tests"

@@ -1,10 +1,10 @@
-from django.apps import apps
 from django.conf import settings as django_settings
 from django.test.signals import setting_changed
 from django.utils.functional import LazyObject
 from django.utils.module_loading import import_string
 
-DJOSER_SETTINGS_NAMESPACE = "DJOSER_PASSWORDLESS"
+JWT_DRF_PASSWORDLESS_SETTINGS_NAMESPACE = "JWT_DRF_PASSWORDLESS"
+
 
 class ObjDict(dict):
     def __getattribute__(self, item):
@@ -32,41 +32,55 @@ default_settings = {
     "REGISTRATION_SETS_UNUSABLE_PASSWORD": True,
     "EMAIL_FIELD_NAME": "email",
     "MOBILE_FIELD_NAME": "phone_number",
+    "UUID_FIELD_NAME": None,
     # If true, an attempt to redeem a token with the wrong token type
     # will count for the times a token has been used
     "INCORRECT_SHORT_TOKEN_REDEEMS_TOKEN": False,
-    "ALLOWED_PASSWORDLESS_METHODS": ["EMAIL"], # ["EMAIL", "MOBILE"]
+    "ALLOWED_PASSWORDLESS_METHODS": ["EMAIL"],  # ["EMAIL", "MOBILE"]
     "PASSWORDLESS_EMAIL_LOGIN_URL": None,
     "MAX_TOKEN_USES": 1,
-    "GENERATORS": ObjDict({
-        "username_generator": "djoser_passwordless.utils.username_generator",
-    }),
-    "EMAIL": ObjDict ({
-        "passwordless_request": "djoser_passwordless.email.PasswordlessRequestEmail",
-    }),
-    "SERIALIZERS": ObjDict({
-        "passwordless_email_token_request": "djoser_passwordless.serializers.PasswordlessEmailTokenRequestSerializer",
-        "passwordless_mobile_token_request": "djoser_passwordless.serializers.PasswordlessMobileTokenRequestSerializer",
-        "passwordless_email_token_exchange": "djoser_passwordless.serializers.PasswordlessEmailTokenExchangeSerializer",
-        'passwordless_mobile_token_exchange': 'djoser_passwordless.serializers.PasswordlessMobileTokenExchangeSerializer',
-        'passwordless_standalone_token_exchange': "djoser_passwordless.serializers.StandalonePasswordlessExchangeSerializer"
-    }),
-    "PERMISSIONS": ObjDict({
-        "passwordless_token_exchange": ["rest_framework.permissions.AllowAny"],
-        "passwordless_token_request": ["rest_framework.permissions.AllowAny"],
-    }),
-    "DECORATORS": ObjDict({
-        "token_request_rate_limit_decorator": "djoser_passwordless.utils.token_request_limiter",
-        "token_redeem_rate_limit_decorator": "djoser_passwordless.utils.token_redeem_limiter",
-    }),
-    "SMS_SENDERS": ObjDict({
-        "passwordless_request": "djoser_passwordless.sms.PasswordlessRequestSMS",
-    }),
-    "CONSTANTS": ObjDict({"messages": "djoser_passwordless.constants.Messages"}),
+    "GENERATORS": ObjDict(
+        {
+            "username_generator": "jwt_drf_passwordless.utils.username_generator",
+        }
+    ),
+    "EMAIL": ObjDict(
+        {
+            "passwordless_request": "jwt_drf_passwordless.email.PasswordlessRequestEmail",
+        }
+    ),
+    "SERIALIZERS": ObjDict(
+        {
+            "passwordless_token_response_class": None,
+            "passwordless_email_token_request": "jwt_drf_passwordless.serializers.PasswordlessEmailTokenRequestSerializer",
+            "passwordless_mobile_token_request": "jwt_drf_passwordless.serializers.PasswordlessMobileTokenRequestSerializer",
+            "passwordless_email_token_exchange": "jwt_drf_passwordless.serializers.PasswordlessEmailTokenExchangeSerializer",
+            "passwordless_mobile_token_exchange": "jwt_drf_passwordless.serializers.PasswordlessMobileTokenExchangeSerializer",
+        }
+    ),
+    "PERMISSIONS": ObjDict(
+        {
+            "passwordless_token_exchange": ["rest_framework.permissions.AllowAny"],
+            "passwordless_token_request": ["rest_framework.permissions.AllowAny"],
+        }
+    ),
+    "DECORATORS": ObjDict(
+        {
+            "token_request_rate_limit_decorator": "jwt_drf_passwordless.utils.token_request_limiter",
+            "token_redeem_rate_limit_decorator": "jwt_drf_passwordless.utils.token_redeem_limiter",
+        }
+    ),
+    "SMS_SENDERS": ObjDict(
+        {
+            "passwordless_request": "jwt_drf_passwordless.sms.PasswordlessRequestSMS",
+        }
+    ),
+    "CONSTANTS": ObjDict({"messages": "jwt_drf_passwordless.constants.Messages"}),
 }
 
 
 SETTINGS_TO_IMPORT = []
+
 
 class Settings:
     def __init__(self, default_settings, explicit_overriden_settings: dict = None):
@@ -74,7 +88,7 @@ class Settings:
             explicit_overriden_settings = {}
 
         overriden_settings = (
-            getattr(django_settings, DJOSER_SETTINGS_NAMESPACE, {})
+            getattr(django_settings, JWT_DRF_PASSWORDLESS_SETTINGS_NAMESPACE, {})
             or explicit_overriden_settings
         )
 
@@ -110,11 +124,11 @@ class LazySettings(LazyObject):
 settings = LazySettings()
 
 
-def reload_djoser_settings(*args, **kwargs):
+def reload_settings(*args, **kwargs):
     global settings
     setting, value = kwargs["setting"], kwargs["value"]
-    if setting == DJOSER_SETTINGS_NAMESPACE:
+    if setting == JWT_DRF_PASSWORDLESS_SETTINGS_NAMESPACE:
         settings._setup(explicit_overriden_settings=value)
 
 
-setting_changed.connect(reload_djoser_settings)
+setting_changed.connect(reload_settings)

@@ -5,21 +5,27 @@ from datetime import timedelta
 
 
 class PasswordlessChallengeTokenManager(models.Manager):
-    
-    def delete_expired(self, token_lifetime_seconds, max_token_uses, only_older_than: None):
-        query = models.Q(created_at__lt=now() - timedelta(seconds=token_lifetime_seconds)) | models.Q(uses__gte=max_token_uses)
+    def delete_expired(
+        self, token_lifetime_seconds, max_token_uses, only_older_than: None
+    ):
+        query = models.Q(
+            created_at__lt=now() - timedelta(seconds=token_lifetime_seconds)
+        ) | models.Q(uses__gte=max_token_uses)
 
         if only_older_than:
-            query = query | models.Q(created_at__lt=now() - timedelta(seconds=only_older_than))
+            query = query | models.Q(
+                created_at__lt=now() - timedelta(seconds=only_older_than)
+            )
 
-        return self.filter(query).delete()  
+        return self.filter(query).delete()
+
 
 class PasswordlessChallengeToken(models.Model):
     objects = PasswordlessChallengeTokenManager()
 
     # We will deliver two tokens. One which is long and one which is short.
     # The short one needs to be redeemed with the same identifier that it was
-    # sent to. This is a mitigation to brute force attacks, that might be able 
+    # sent to. This is a mitigation to brute force attacks, that might be able
     # to break a short token.
     # The long token can be redeemed without any other information, as it is
     # significantly harder to brute force.
@@ -32,7 +38,7 @@ class PasswordlessChallengeToken(models.Model):
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        related_name="djoser_passwordless_tokens",
+        related_name="jwt_drf_passwordless_tokens",
         null=True,
         on_delete=models.CASCADE,
     )
@@ -40,7 +46,7 @@ class PasswordlessChallengeToken(models.Model):
     def redeem(self):
         self.uses += 1
         return self.save()
-  
+
     def is_valid(self, token_lifetime_seconds, max_token_uses):
         if self.created_at + timedelta(seconds=token_lifetime_seconds) < now():
             return False

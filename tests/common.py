@@ -1,21 +1,16 @@
 from django.contrib.auth import get_user_model
-from django.db import IntegrityError
-
-from djoser_passwordless.conf import settings
-from djoser.conf import settings as djoser_settings
-
-from unittest import mock
-Token = djoser_settings.TOKEN_MODEL
+from jwt_drf_passwordless.serializers import PasswordlessTokenService
 
 
 def create_user(use_custom_data=False, **kwargs):
     data = (
-        {"username": "john", "password": "secret", "email": "john@beatles.com"}
+        {"username": "john", "password": "secret", "email": "john@beatles.com", "phone_number": "+358414111111"}
         if not use_custom_data
         else {
             "custom_username": "john",
             "password": "secret",
             "custom_email": "john@beatles.com",
+            "custom_mobile": "+358414111111",
             "custom_required_field": "42",
         }
     )
@@ -23,3 +18,8 @@ def create_user(use_custom_data=False, **kwargs):
     user = get_user_model().objects.create_user(**data)
     user.raw_password = data["password"]
     return user
+
+
+def create_token(identifier_field):
+    user = create_user()
+    return PasswordlessTokenService.create_token(user, identifier_field)

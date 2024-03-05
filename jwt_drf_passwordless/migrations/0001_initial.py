@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now=True)),
                 ('uses', models.IntegerField(default=0)),
                 ('token_request_identifier', models.TextField()),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='djoser_passwordless_tokens', to=settings.AUTH_USER_MODEL)),
+                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='jwt_drf_passwordless_tokens', to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

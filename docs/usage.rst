@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use Djoser passwordless in a project::
+To use jwt drf passwordless in a project::
 
-    import djoser_passwordless
+    import jwt_drf_passwordless

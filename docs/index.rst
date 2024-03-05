@@ -1,4 +1,4 @@
-Welcome to Djoser passwordless's documentation!
+Welcome to jwt drf passwordless's documentation!
 ======================================
 
 .. toctree::

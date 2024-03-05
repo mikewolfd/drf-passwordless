@@ -1,9 +1,7 @@
-**⛔️ WORK IN PROGRESS - not yet released**
-![Main status](https://github.com/sergioisidoro/djoser-passwordless/actions/workflows/test-suite.yml/badge.svg)
-[![codecov](https://codecov.io/gh/sergioisidoro/djoser-passwordless/branch/main/graph/badge.svg?token=96USU05I2T)](https://codecov.io/gh/sergioisidoro/djoser-passwordless)
+**⛔️ ALPHA -- WORK IN PROGRESS *
 
-# Djoser passwordless
-A Passwordless login add-on for Djoser (Django Rest Framework authentication). Built with `djoser`, `django-sms` and `django-phonenumber-field`
+# jwt drf passwordless
+A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms` and `django-phonenumber-field` and `djangorestframework-simplejwt` with complete statelessness in mind.
 
 ## 🔑 Before you start!
 Please consider your risk and threat landscape before adopting this library. 
@@ -12,19 +10,18 @@ Authentication is always a trade-off of usability and security. This library has
 
 ## Installation 
 ```.sh
-pip install djoser_passwordless
+pip install jwt_drf_passwordless
 ```
 
 `settings.py`
 ```.py
 INSTALLED_APPS = (
     ...
-    "djoser",
-    "djoser_passwordless",
+    "jwt_drf_passwordless",
     ...
 )
 ...
-DJOSER_PASSWORDLESS = {
+jwt_drf_passwordless = {
     "ALLOWED_PASSWORDLESS_METHODS": ["EMAIL", "MOBILE"]
 }
 ```
@@ -33,7 +30,7 @@ DJOSER_PASSWORDLESS = {
 ```
 urlpatterns = (
     ...
-    re_path(r"^passwordless/", include("djoser_passwordless.urls")),
+    re_path(r"^passwordless/", include("jwt_drf_passwordless.urls")),
     ...
 )
 ```
@@ -50,7 +47,8 @@ Although token requests are throttled by default, and token lifetime is limited,
 ## Features
 * International phone number validation and standardization (expects db phone numbers to be in same format)
 * Basic throttling
-* Configurable tokens
+* Stateless JWT tokens by default
+* TypeID username and uuid generator
 * Short (for SMS) and long tokens for magic links
 * Configurable serializers, permissions and decorators.
 
@@ -59,7 +57,6 @@ Although token requests are throttled by default, and token lifetime is limited,
 #### Available URLS
 * `request/email/`
 * `request/mobile`
-* `exchange/standalone/`
 * `exchange/email/`
 * `exchange/mobile/`
 
@@ -89,7 +86,8 @@ curl --request POST \
 ```
 ```.json
 {
-	"auth_token": "3b8e6a2aed0435f95495e728b0fb41d0367a872d"
+	"refresh": "3b8e6a2aed0435f95495e728b0fb41d0367a872d",
+  "access": "3b8e6a2aed0435f95495e728b0fb41d0367a872d"
 }
 ```
 
@@ -100,6 +98,7 @@ curl --request POST \
 * `ALLOWED_PASSWORDLESS_METHODS` (default=["email"]) - Which methods can be used to request a token? (Valid - `["email", "mobile"]`)
 * `EMAIL_FIELD_NAME` (default="email") - Name of the user field that holds the email info
 * `MOBILE_FIELD_NAME` (default="phone_number") - Name of the user field that holds phone number info
+* `UUID_FIELD_NAME` (default=None) - Name of the user field that holds the uuid info, will be populated with the uuid7 value used for the temporary username by the default generator
 * `SHORT_TOKEN_LENGTH` (default=6) - The length of the short tokens
 * `LONG_TOKEN_LENGTH` (default=64) - The length of the tokens that can redeemed standalone (without the original request data)
 * `SHORT_TOKEN_CHARS` (default="0123456789") - The characters to be used when generating the short token
@@ -112,13 +111,15 @@ curl --request POST \
 * `REGISTRATION_SETS_UNUSABLE_PASSWORD` (Default=True) - When unusable password is set, users cannot reset passwords via the normal Django flows. This means users registered via passwordless cannot login through password.
 * `INCORRECT_SHORT_TOKEN_REDEEMS_TOKEN` (default=False) - Should incorrect short token auth attempts count to the uses of a token? When set to true, together with `MAX_TOKEN_USES` to 1, this means a token has only one shot at being used.
 * `PASSWORDLESS_EMAIL_LOGIN_URL` (default=None) - URL template for the link redeeming the standalone link: eg `my-app://page/{token}`
+  
+#### Advanced configuration
+
 
 
 ## Credits
 This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
 
 * Aaronn's `django-rest-framework-passwordless` project https://github.com/aaronn/django-rest-framework-passwordless
-* Sunscrapers' Djoser project - https://github.com/sunscrapers/djoser
 * Cookiecutter: https://github.com/audreyr/cookiecutter
 * `audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
 

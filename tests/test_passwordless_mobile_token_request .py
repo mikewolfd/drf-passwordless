@@ -3,13 +3,16 @@ from djet import assertions
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
-from testapp.tests.common import create_user
+from .common import create_user
 from django.conf import settings
 from django.test.utils import override_settings
 
 User = get_user_model()
 
-class TestPasswordlessEmailTokenRequest(APITestCase, assertions.StatusCodeAssertionsMixin):
+
+class TestPasswordlessMobileTokenRequest(
+    APITestCase, assertions.StatusCodeAssertionsMixin
+):
     url = reverse("passwordless_mobile_signup_request")
 
     def test_post_gibberish_will_return_validation_errors(self):
@@ -18,36 +21,51 @@ class TestPasswordlessEmailTokenRequest(APITestCase, assertions.StatusCodeAssert
         self.assert_status_equal(response, status.HTTP_400_BAD_REQUEST)
 
     @override_settings(
-        DJOSER_PASSWORDLESS=dict(settings.DJOSER_PASSWORDLESS, **{
-          "REGISTER_NONEXISTENT_USERS": False
-        })
+        JWT_DRF_PASSWORDLESS=dict(
+            settings.JWT_DRF_PASSWORDLESS, **{"REGISTER_NONEXISTENT_USERS": False}
+        )
     )
-    def test_post_with_non_existing_user_should_return_400_if_registration_disabled(self):
+    def test_post_with_non_existing_user_should_return_400_if_registration_disabled(
+        self,
+    ):
         data = {"phone_number": "+358 414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_400_BAD_REQUEST)
 
     @override_settings(
-        DJOSER_PASSWORDLESS=dict(settings.DJOSER_PASSWORDLESS, **{
-          "REGISTER_NONEXISTENT_USERS": True
-        })
+        JWT_DRF_PASSWORDLESS=dict(
+            settings.JWT_DRF_PASSWORDLESS, **{"REGISTER_NONEXISTENT_USERS": True}
+        )
     )
     def test_post_request_with_new_user_successful_with_registration_enabled(self):
         data = {"phone_number": "+358 414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_200_OK)
+        user = User.objects.get(phone_number="+358414111111")
+        self.assertIsNotNone(user)
+
+    @override_settings(
+        JWT_DRF_PASSWORDLESS=dict(
+            settings.JWT_DRF_PASSWORDLESS, **{"REGISTER_NONEXISTENT_USERS": True}
+        )
+    )
+    def test_post_request_with_new_user_generated_username(self):
+        data = {"phone_number": "+358 414111111"}
+        self.client.post(self.url, data=data)
+        user = User.objects.get(phone_number="+358414111111")
+        self.assertTrue(len(user.get_username()) == 26)
 
     def test_post_request_with_existing_user_successful(self):
         user = create_user(phone_number="+358414111111")
         data = {"phone_number": "+358414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_200_OK)
-        user.djoser_passwordless_tokens.count() == 1
+        user.jwt_drf_passwordless_tokens.count() == 1
 
     @override_settings(
-        DJOSER_PASSWORDLESS=dict(settings.DJOSER_PASSWORDLESS, **{
-          "TOKEN_REQUEST_THROTTLE_SECONDS": None
-        })
+        JWT_DRF_PASSWORDLESS=dict(
+            settings.JWT_DRF_PASSWORDLESS, **{"TOKEN_REQUEST_THROTTLE_SECONDS": None}
+        )
     )
     def test_post_request_user_should_not_have_more_than_one_active_token(self):
         user = create_user(phone_number="+358414111111")
@@ -56,24 +74,23 @@ class TestPasswordlessEmailTokenRequest(APITestCase, assertions.StatusCodeAssert
         self.assert_status_equal(response, status.HTTP_200_OK)
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_200_OK)
-        user.djoser_passwordless_tokens.count() == 1
+        user.jwt_drf_passwordless_tokens.count() == 1
 
     @override_settings(
-        DJOSER_PASSWORDLESS=dict(settings.DJOSER_PASSWORDLESS, **{
-          "TOKEN_REQUEST_THROTTLE_SECONDS": None
-        })
+        JWT_DRF_PASSWORDLESS=dict(
+            settings.JWT_DRF_PASSWORDLESS, **{"TOKEN_REQUEST_THROTTLE_SECONDS": None}
+        )
     )
     def test_normalize_phone_number_do_not_create_multiple(self):
         user = create_user(phone_number="+358414111111")
         data = {"phone_number": "+358 0414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_200_OK)
-
-        data = {"phone_number": "+358 414111111"}
+        data = {"phone_number": "+358  414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_200_OK)
 
-        user.djoser_passwordless_tokens.count() == 1
+        user.jwt_drf_passwordless_tokens.count() == 1
 
     def test_throttle_token_requests_independently_of_phone_format(self):
         user = create_user(phone_number="+358414111111")
@@ -83,4 +100,4 @@ class TestPasswordlessEmailTokenRequest(APITestCase, assertions.StatusCodeAssert
         data = {"phone_number": "+358 414111111"}
         response = self.client.post(self.url, data=data)
         self.assert_status_equal(response, status.HTTP_429_TOO_MANY_REQUESTS)
-        user.djoser_passwordless_tokens.count() == 1
+        user.jwt_drf_passwordless_tokens.count() == 1
