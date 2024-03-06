@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser
 from django.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 
 class StandardUserManager(BaseUserManager):
@@ -17,7 +18,7 @@ class StandardUserManager(BaseUserManager):
 class StandardUser(AbstractUser):
     # Phone number is field agnostic, but it expects all numbers to be in E.164 format
     # or other configured format according to django phonenumber field settings
-    phone_number = models.CharField(max_length=20, blank=False, null=True)
+    phone_number = PhoneNumberField(blank=False, null=True)
     USERNAME_FIELD = "username"
     objects = StandardUserManager()
 
@@ -39,7 +40,7 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractBaseUser):
     custom_username = models.CharField(max_length=150)
     custom_email = models.EmailField(blank=True)
-    custom_mobile = models.CharField(max_length=20, blank=True)
+    custom_mobile = PhoneNumberField(blank=True, null=True)
     custom_required_field = models.CharField(max_length=2)
     is_active = models.BooleanField(default=True)
     objects = CustomUserManager()

@@ -114,7 +114,7 @@ class PasswordlessMobileTokenRequestView(AbstractPasswordlessTokenRequestView):
         user = token.user
         context = {"user": user, "token": token.token, "short_token": token.short_token}
         to = getattr(user, settings.MOBILE_FIELD_NAME)
-        return settings.SMS_SENDERS.passwordless_request(self.request, context).send(to)
+        return settings.SMS_SENDERS.passwordless_request(self.request, context).send(str(to))
 
 
 class AbstractExchangePasswordlessTokenForAuthTokenView(generics.GenericAPIView):
