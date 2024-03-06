@@ -3,10 +3,18 @@
 # jwt drf passwordless
 A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms`, `django-phonenumber-field`, `typeid-python` and `djangorestframework-simplejwt` with complete statelessness in mind.
 
-## 🔑 Before you start!
-Please consider your risk and threat landscape before adopting this library. 
+## Great Thanks
+This project is a fork of Sergioisidoro's [`djoser-passwordless`](https://github.com/sergioisidoro/djoser-passwordless) project, I have mostly just modified and customized this to be more in line with my own needs and preferences. Which include statelessness, independence of other authentication packages, and a more flexible and configurable approach to the token generation and validation.
 
-Authentication is always a trade-off of usability and security. This library has been built to give you the power to adjust those trade-offs as much as possible, and made an attempt to give you a reasonable set of defaults, but it's up to you to make those decisions. Please consider the following risks bellow 
+## 🔑 Before you start!
+Please consider your risk and threat landscape before adopting this library.
+
+Authentication is always a trade-off of usability and security. This library has been built to give you the power to adjust those trade-offs as much as possible, and made an attempt to give you a reasonable set of defaults, but it's up to you to make those decisions. Please consider the following risks bellow.
+
+## TODO
+* [ ] recaptcha verification
+* [ ] webauthn support
+* [ ] better documentation
 
 ## Installation 
 ```.sh
