@@ -30,11 +30,11 @@ class PasswordlessChallengeToken(models.Model):
     # The long token can be redeemed without any other information, as it is
     # significantly harder to brute force.
 
-    token = models.TextField(unique=True)
-    short_token = models.TextField()
+    token = models.CharField(unique=True, max_length=255)
+    short_token = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now=True)
     uses = models.IntegerField(default=0)
-    token_request_identifier = models.TextField()
+    token_request_identifier = models.CharField(max_length=255)
 
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
