@@ -40,6 +40,7 @@ class PasswordlessChallengeToken(models.Model):
         settings.AUTH_USER_MODEL,
         related_name="jwt_drf_passwordless_tokens",
         null=True,
+        db_index=True,
         on_delete=models.CASCADE,
     )
 

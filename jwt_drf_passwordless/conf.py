@@ -32,18 +32,12 @@ default_settings = {
     "REGISTRATION_SETS_UNUSABLE_PASSWORD": True,
     "EMAIL_FIELD_NAME": "email",
     "MOBILE_FIELD_NAME": "phone_number",
-    "UUID_FIELD_NAME": None,
     # If true, an attempt to redeem a token with the wrong token type
     # will count for the times a token has been used
     "INCORRECT_SHORT_TOKEN_REDEEMS_TOKEN": False,
     "ALLOWED_PASSWORDLESS_METHODS": ["EMAIL"],  # ["EMAIL", "MOBILE"]
     "PASSWORDLESS_EMAIL_LOGIN_URL": None,
     "MAX_TOKEN_USES": 1,
-    "GENERATORS": ObjDict(
-        {
-            "username_generator": "jwt_drf_passwordless.utils.username_generator",
-        }
-    ),
     "EMAIL": ObjDict(
         {
             "passwordless_request": "jwt_drf_passwordless.email.PasswordlessRequestEmail",
@@ -87,10 +81,7 @@ class Settings:
         if explicit_overriden_settings is None:
             explicit_overriden_settings = {}
 
-        overriden_settings = (
-            getattr(django_settings, JWT_DRF_PASSWORDLESS_SETTINGS_NAMESPACE, {})
-            or explicit_overriden_settings
-        )
+        overriden_settings = (getattr(django_settings, JWT_DRF_PASSWORDLESS_SETTINGS_NAMESPACE, {}) or explicit_overriden_settings)
 
         self._load_default_settings()
         self._override_settings(overriden_settings)

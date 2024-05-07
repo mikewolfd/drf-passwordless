@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jwt-drf-passwordless"
-version = "0.1.2"
+version = "0.1.3"
 description = "A passworldess plugin for Django Rest Framework authentication package"
 authors = ["Sergio <smaisidoro@gmail.com>", "Mike Deeb <michael.f.deeb@gmail.com>"]
 license = "MIT"
@@ -14,7 +14,6 @@ django-templated-mail = "^1.1.1"
 djangorestframework-simplejwt = "^5.0"
 django = "^5.0.2"
 django-phonenumber-field = {extras = ["phonenumberslite"], version = "^7.3.0"}
-typeid-python = "^0.2.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"

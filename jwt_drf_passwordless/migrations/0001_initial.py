@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -15,15 +14,31 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='PasswordlessChallengeToken',
+            name="PasswordlessChallengeToken",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('token', models.TextField(unique=True)),
-                ('short_token', models.TextField()),
-                ('created_at', models.DateTimeField(auto_now=True)),
-                ('uses', models.IntegerField(default=0)),
-                ('token_request_identifier', models.TextField()),
-                ('user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='jwt_drf_passwordless_tokens', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("token", models.TextField(unique=True)),
+                ("short_token", models.TextField()),
+                ("created_at", models.DateTimeField(auto_now=True)),
+                ("uses", models.IntegerField(default=0)),
+                ("token_request_identifier", models.TextField()),
+                (
+                    "user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="jwt_drf_passwordless_tokens",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

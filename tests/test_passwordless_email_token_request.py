@@ -49,24 +49,11 @@ class TestPasswordlessEmailTokenRequest(
 
     @override_settings(
         JWT_DRF_PASSWORDLESS=dict(
-            settings.JWT_DRF_PASSWORDLESS, **{"REGISTER_NONEXISTENT_USERS": True}
-        )
-    )
-    def test_post_request_with_new_user_generated_username(
-        self,
-    ):
-        data = {"email": "super@duper.com"}
-        self.client.post(self.url, data=data)
-        user = User.objects.get(email=data["email"])
-        self.assertTrue(len(user.get_username()) == 26)
-        
-    @override_settings(
-        JWT_DRF_PASSWORDLESS=dict(
             settings.JWT_DRF_PASSWORDLESS,
             **{
                 "REGISTER_NONEXISTENT_USERS": True,
                 "REGISTRATION_SETS_UNUSABLE_PASSWORD": False,
-            }
+            },
         )
     )
     def test_post_request_with_new_user_successful_with_usable_password_when_registration_enabled(

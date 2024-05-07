@@ -44,17 +44,6 @@ class TestPasswordlessMobileTokenRequest(
         user = User.objects.get(phone_number="+358414111111")
         self.assertIsNotNone(user)
 
-    @override_settings(
-        JWT_DRF_PASSWORDLESS=dict(
-            settings.JWT_DRF_PASSWORDLESS, **{"REGISTER_NONEXISTENT_USERS": True}
-        )
-    )
-    def test_post_request_with_new_user_generated_username(self):
-        data = {"phone_number": "+358 414111111"}
-        self.client.post(self.url, data=data)
-        user = User.objects.get(phone_number="+358414111111")
-        self.assertTrue(len(user.get_username()) == 26)
-
     def test_post_request_with_existing_user_successful(self):
         user = create_user(phone_number="+358414111111")
         data = {"phone_number": "+358414111111"}

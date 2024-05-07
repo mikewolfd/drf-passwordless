@@ -31,15 +31,15 @@ class AbstractPasswordlessTokenRequestSerializer(serializers.Serializer):
         user = self.find_user_by_identifier(identifier_value)
         if not settings.REGISTER_NONEXISTENT_USERS and not user:
             raise serializers.ValidationError(Messages.CANNOT_SEND_TOKEN)
+        validated_data["user"] = user
         return validated_data
 
     def create(self, validated_data):
         identifier_value = validated_data[self.token_request_identifier_field]
-        user = self.find_user_by_identifier(identifier_value)
+        user = validated_data["user"]
         if settings.REGISTER_NONEXISTENT_USERS is True and not user:
             attributes = {
                 self.token_request_identifier_field: identifier_value,
-                **settings.GENERATORS.username_generator(),
             }
             user = User.objects.create(**attributes)
             if settings.REGISTRATION_SETS_UNUSABLE_PASSWORD:

@@ -41,9 +41,7 @@ class PasswordlessTokenService(object):
     def should_throttle(user):
         if settings.TOKEN_REQUEST_THROTTLE_SECONDS:
             return (
-                user.jwt_drf_passwordless_tokens.filter(
-                    created_at__gt=now() - timedelta(seconds=settings.TOKEN_REQUEST_THROTTLE_SECONDS)
-                ).count() > 0
+                user.jwt_drf_passwordless_tokens.filter(created_at__gt=now() - timedelta(seconds=settings.TOKEN_REQUEST_THROTTLE_SECONDS)).count() > 0
             )
         return False
 

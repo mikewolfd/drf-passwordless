@@ -22,5 +22,5 @@ urlpatterns = [
         r"^exchange/email/$",
         views.EmailExchangePasswordlessTokenForAuthTokenView.as_view(),
         name="email_passwordless_token_exchange",
-    )
+    ),
 ]

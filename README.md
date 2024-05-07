@@ -1,7 +1,7 @@
 # **⛔️ ALPHA -- WORK IN PROGRESS**
 
 # jwt drf passwordless
-A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms`, `django-phonenumber-field`, `typeid-python` and `djangorestframework-simplejwt` with complete statelessness in mind.
+A Passwordless login add-on for Django Rest Framework authentication. Built with `django-sms`, `django-phonenumber-field` and `djangorestframework-simplejwt` with complete statelessness in mind.
 
 ## Great Thanks
 This project is a fork of Sergioisidoro's [`djoser-passwordless`](https://github.com/sergioisidoro/djoser-passwordless) project, I have mostly just modified and customized this to be more in line with my own needs and preferences. Which include statelessness, independence of other authentication packages, and a more flexible and configurable approach to the token generation and validation.
@@ -56,7 +56,6 @@ Although token requests are throttled by default, and token lifetime is limited,
 * International phone number validation and standardization (expects db phone numbers to be in same format)
 * Basic throttling
 * Stateless JWT tokens by default
-* TypeID username and uuid generator
 * Short (for SMS) and long tokens for magic links
 * Configurable serializers, permissions and decorators.
 
@@ -106,7 +105,6 @@ curl --request POST \
 * `ALLOWED_PASSWORDLESS_METHODS` (default=["email"]) - Which methods can be used to request a token? (Valid - `["email", "mobile"]`)
 * `EMAIL_FIELD_NAME` (default="email") - Name of the user field that holds the email info
 * `MOBILE_FIELD_NAME` (default="phone_number") - Name of the user field that holds phone number info
-* `UUID_FIELD_NAME` (default=None) - Name of the user field that holds the uuid info, will be populated with the uuid7 value used for the temporary username by the default generator
 * `SHORT_TOKEN_LENGTH` (default=6) - The length of the short tokens
 * `LONG_TOKEN_LENGTH` (default=64) - The length of the tokens that can redeemed standalone (without the original request data)
 * `SHORT_TOKEN_CHARS` (default="0123456789") - The characters to be used when generating the short token
@@ -115,7 +113,7 @@ curl --request POST \
 * `MAX_TOKEN_USES` (default=1) - How many times a token can be used - This can be adjusted because some email clients try to follow links, and might accidentally use tokens.
 * `TOKEN_REQUEST_THROTTLE_SECONDS` - (default=60) - How many seconds to wait before allowing a new token to be issued for a particular user
 * `ALLOW_ADMIN_AUTHENTICATION` (default=False) - Allow admin users to login without password (checks `is_admin` and `is_staff` from Django `AbstractUser`)
-* `REGISTER_NONEXISTENT_USERS` (default=False) - Register users who do not have an account and request a passwordless login token? - Will generate a random username which is configurable (See. conf.py)
+* `REGISTER_NONEXISTENT_USERS` (default=False) - Register users who do not have an account and request a passwordless login token?
 * `REGISTRATION_SETS_UNUSABLE_PASSWORD` (Default=True) - When unusable password is set, users cannot reset passwords via the normal Django flows. This means users registered via passwordless cannot login through password.
 * `INCORRECT_SHORT_TOKEN_REDEEMS_TOKEN` (default=False) - Should incorrect short token auth attempts count to the uses of a token? When set to true, together with `MAX_TOKEN_USES` to 1, this means a token has only one shot at being used.
 * `PASSWORDLESS_EMAIL_LOGIN_URL` (default=None) - URL template for the link redeeming the standalone link: eg `my-app://page/{token}`
