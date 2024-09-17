@@ -10,9 +10,9 @@ packages = [{include = "jwt_drf_passwordless"}]
 [tool.poetry.dependencies]
 python = "^3.10"
 django-sms = "^0.7.0"
-django-templated-mail = {git = "https://github.com/mikewolfd/django-templated-mail.git", rev = "7036c373952b87f8152f4a39eda5025b426b3b6c"}
 djangorestframework-simplejwt = "^5.3.1"
-djangorestframework = {git = "https://github.com/encode/django-rest-framework.git", rev = "b25028ac8f46984459f9d9e28069b797986ae476"}
+djangorestframework = "^3.15.2"
+django-templated-mail-2 = "^1.1.2"
 django = "^5.1.1"
 django-phonenumber-field = {extras = ["phonenumberslite"], version = "^8.0.0"}
 

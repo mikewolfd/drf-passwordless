@@ -632,19 +632,15 @@ messagebird = ["messagebird"]
 twilio = ["twilio"]
 
 [[package]]
-name = "django-templated-mail"
-version = "1.1.1"
+name = "django-templated-mail-2"
+version = "1.1.2"
 description = "Send emails using Django template system."
 optional = false
 python-versions = "*"
-files = []
-develop = false
-
-[package.source]
-type = "git"
-url = "https://github.com/mikewolfd/django-templated-mail.git"
-reference = "7036c373952b87f8152f4a39eda5025b426b3b6c"
-resolved_reference = "7036c373952b87f8152f4a39eda5025b426b3b6c"
+files = [
+    {file = "django_templated_mail_2-1.1.2-py3-none-any.whl", hash = "sha256:bea63d69e768a55706eddb41667755b1ab56e5ba6c5e9ef35f9d3d81b298706c"},
+    {file = "django_templated_mail_2-1.1.2.tar.gz", hash = "sha256:60b12ee6f7ed2e93fdce2eff5a91e9dce5f7e59da57d46ac16c1f63f4f7ca2b7"},
+]
 
 [[package]]
 name = "djangorestframework"
@@ -652,17 +648,13 @@ version = "3.15.2"
 description = "Web APIs for Django, made easy."
 optional = false
 python-versions = ">=3.8"
-files = []
-develop = false
+files = [
+    {file = "djangorestframework-3.15.2-py3-none-any.whl", hash = "sha256:2b8871b062ba1aefc2de01f773875441a961fefbf79f5eed1e32b2f096944b20"},
+    {file = "djangorestframework-3.15.2.tar.gz", hash = "sha256:36fe88cd2d6c6bec23dca9804bab2ba5517a8bb9d8f47ebc68981b56840107ad"},
+]
 
 [package.dependencies]
 django = ">=4.2"
-
-[package.source]
-type = "git"
-url = "https://github.com/encode/django-rest-framework.git"
-reference = "b25028ac8f46984459f9d9e28069b797986ae476"
-resolved_reference = "b25028ac8f46984459f9d9e28069b797986ae476"
 
 [[package]]
 name = "djangorestframework-simplejwt"
@@ -2279,4 +2271,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "31c9e9c52dcbc1144ca7b4ca5fb15befeb64772b49161f3619ffda3e974965aa"
+content-hash = "6ae9d43999a6d46d5989e1f94e6e32be1b20a6b28eb65ae453c28b230a632ca8"
